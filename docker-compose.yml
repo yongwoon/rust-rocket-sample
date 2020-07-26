@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+  # web:
+  #   container_name: dev_rust_rocket_blog_web
+  #   build: ./web
+  #   volumes:
+  #     - ./web:/usr/src/app
+  #   ports:
+  #     - "3000:3000"
+  #   command: bash -c "yarn && yarn start"
+  #   links:
+  #     - api
+  #   networks:
+  #     - dev_rust_rocket_blog_network
+
+  api:
+    container_name: dev_rust_rocket_blog_api
+    build:
+      context: ./api/
+      dockerfile: Dockerfile.dev
+    environment:
+      - USER=root
+      - DATABASE_URL=postgres://postgres:supersecretpassword@db/rustydb
+    tty: true
+    ports:
+      - 8000:8000
+    volumes:
+      - ./api:/usr/src/app
+    links:
+      - db
+    # diesel infer_schema macro gives warnings with this flag.
+    # environment:
+    #   - CARGO_INCREMENTAL=1
+    command: bash -c "bash ./wait-for-it.sh db:5432 -q -- diesel setup && cargo watch -x run"
+    networks:
+      - dev_rust_rocket_blog_network
+
+  db:
+    container_name: dev_rust_rocket_blog_db
+    image: "postgres:12"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      POSTGRES_PASSWORD: supersecretpassword
+      PGDATA: /var/lib/postgresql/data/pgdata
+    networks:
+      - dev_rust_rocket_blog_network
+
+# cargo will try to redownload packages @ docker-compose up so store them here.
+volumes:
+  pgdata: {}
+networks:
+  dev_rust_rocket_blog_network:
