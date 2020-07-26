@@ -2,7 +2,7 @@ version: "3"
 
 services:
   # web:
-  #   container_name: dev_rust_rocket_blog_web
+  #   container_name: dev_rust_rocket_sample_web
   #   build: ./web
   #   volumes:
   #     - ./web:/usr/src/app
@@ -12,10 +12,10 @@ services:
   #   links:
   #     - api
   #   networks:
-  #     - dev_rust_rocket_blog_network
+  #     - dev_rust_rocket_sample_network
 
   api:
-    container_name: dev_rust_rocket_blog_api
+    container_name: dev_rust_rocket_sample_api
     build:
       context: ./api/
       dockerfile: Dockerfile.dev
@@ -34,10 +34,10 @@ services:
     #   - CARGO_INCREMENTAL=1
     command: bash -c "bash ./wait-for-it.sh db:5432 -q -- diesel setup && cargo watch -x run"
     networks:
-      - dev_rust_rocket_blog_network
+      - dev_rust_rocket_sample_network
 
   db:
-    container_name: dev_rust_rocket_blog_db
+    container_name: dev_rust_rocket_sample_db
     image: "postgres:12"
     ports:
       - "5432:5432"
@@ -47,10 +47,10 @@ services:
       POSTGRES_PASSWORD: supersecretpassword
       PGDATA: /var/lib/postgresql/data/pgdata
     networks:
-      - dev_rust_rocket_blog_network
+      - dev_rust_rocket_sample_network
 
 # cargo will try to redownload packages @ docker-compose up so store them here.
 volumes:
   pgdata: {}
 networks:
-  dev_rust_rocket_blog_network:
+  dev_rust_rocket_sample_network:
